@@ -1,5 +1,7 @@
 # Ember.js Promising Auth
 
+![img](https://d2weczhvl823v0.cloudfront.net/darthdeus/ember-promising-auth/trend.png)
+
 This is an authentication solution for the new promise based Ember.js
 router, written completely from scratch to make use of all of the new
 features.
