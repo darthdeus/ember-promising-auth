@@ -26,11 +26,26 @@ Ember.PromisingAuth = Ember.Object.extend(Ember.Evented, {
   },
 
   recall: function() {
-    var promise = new Ember.RSVP.Promise(function(resolve, reject) {
-      // TODO
+    var self = this,
+        rememberToken = localStorage.getItem(this.rememberTokenKey);
+
+    if (rememberToken === "undefined")  {
+      self.trigger("rememberError");
+      return Ember.RSVP.reject();
+    }
+
+    var response = this.signIn({
+      remember_token: rememberToken
     });
 
-    return promise;
+    response.then(function() {
+      self.trigger("rememberSuccess");
+    }, function() {
+      self.trigger("rememberError");
+    });
+
+    // make this RSVP.Promise
+    return response;
   },
 
   user: function() {
@@ -66,7 +81,9 @@ Ember.PromisingAuth = Ember.Object.extend(Ember.Evented, {
       userId: response.user_id
     });
 
-    window.localStorage.setItem(this.rememberTokenKey, response.remember_token);
+    if (response.remember_token) {
+      localStorage.setItem(this.rememberTokenKey, response.remember_token);
+    }
 
     this.trigger("signInSuccess");
   },
