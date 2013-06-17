@@ -6,13 +6,47 @@ This is an authentication solution for the new promise based Ember.js
 router, written completely from scratch to make use of all of the new
 features.
 
+## Usage
+
+```javascript
+App.Auth = Ember.PromisingAuth.create({
+  baseUrl: env.base_url,
+  signInEndPoint: "/sign_in",
+  signOutEndPoint: "/sign_out"
+});
+
+App.deferReadiness();
+
+App.Auth.recall().then(function() {
+  App.advanceReadiness();
+}, function() {
+  App.advanceReadiness();
+});
+```
+
+```javascript
+App.SecretRoute = Ember.Route.extend({
+  beforeModel: function(transitionEvent) {
+    if (!App.Auth.get("signedIn")) {
+      this.transitionTo("sign_in");
+
+      App.Auth.one("signInSuccess", this, function() {
+        transitionEvent.retry();
+      });
+
+    } else {
+      return Ember.RSVP.resolve();
+    }
+  }
+});
+```
+
+
 ## Examples
 
 Since promises are awesome, they're everywhere.
 
 ```javascript
-App.Auth = Ember.PromisingAuth.extend();
-
 App.Auth.signIn({
   username: "john",
   password: "secret"
