@@ -1,5 +1,6 @@
 Ember.PromisingAuth = Ember.Object.extend(Ember.Evented, {
 
+  baseUrl: "/",
   signInEndPoint: "/users/sign_in",
   signOutEndPoint: "/users/sign_out",
   rememberTokenKey: "ember-promising-auth-remember-token",
@@ -9,7 +10,7 @@ Ember.PromisingAuth = Ember.Object.extend(Ember.Evented, {
 
   signIn: function(data) {
     var promise = Ember.$.ajax({
-      url: this.signInEndPoint,
+      url: this.baseUrl + this.signInEndPoint,
       type: "POST",
       dataType: "json",
       context: this,
@@ -22,7 +23,8 @@ Ember.PromisingAuth = Ember.Object.extend(Ember.Evented, {
   },
 
   signOut: function() {
-    return this.ajax(this.signOutEndPoint, data, "DELETE");
+    localStorage.removeItem(this.rememberTokenKey);
+    return this.ajax(this.baseUrl + this.signOutEndPoint, {}, "DELETE");
   },
 
   recall: function() {
