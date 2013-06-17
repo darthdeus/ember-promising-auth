@@ -31,7 +31,7 @@ Ember.PromisingAuth = Ember.Object.extend(Ember.Evented, {
     var self = this,
         rememberToken = localStorage.getItem(this.rememberTokenKey);
 
-    if (rememberToken === "undefined")  {
+    if (!rememberToken || rememberToken === "undefined")  {
       self.trigger("rememberError");
       return Ember.RSVP.reject();
     }
