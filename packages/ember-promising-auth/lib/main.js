@@ -1,3 +1,11 @@
+function buildUrl(a, b) {
+  if (a !== "/") {
+    return a + b;
+  } else {
+    return b;
+  }
+}
+
 Ember.PromisingAuth = Ember.Object.extend(Ember.Evented, {
 
   baseUrl: "/",
@@ -10,7 +18,7 @@ Ember.PromisingAuth = Ember.Object.extend(Ember.Evented, {
 
   signIn: function(data) {
     var promise = Ember.$.ajax({
-      url: this.baseUrl + this.signInEndPoint,
+      url: buildUrl(this.baseUrl, this.signInEndPoint),
       type: "POST",
       dataType: "json",
       context: this,
@@ -23,8 +31,13 @@ Ember.PromisingAuth = Ember.Object.extend(Ember.Evented, {
   },
 
   signOut: function() {
-    localStorage.removeItem(this.rememberTokenKey);
-    return this.ajax(this.baseUrl + this.signOutEndPoint, {}, "DELETE");
+    if (this.get("signedIn")) {
+      this.set("userId", null);
+      localStorage.removeItem(this.rememberTokenKey);
+      return this.ajax(buildUrl(this.baseUrl, this.signOutEndPoint), {}, "DELETE");
+    } else {
+      return Ember.RSVP.resolve(); // the user is already signed out
+    }
   },
 
   recall: function() {
@@ -60,8 +73,8 @@ Ember.PromisingAuth = Ember.Object.extend(Ember.Evented, {
   }.property("userId"),
 
   signedIn: function() {
-    return false;
-  }.property(),
+    return !!this.get("userId");
+  }.property("userId"),
 
   ajax: function(url, data, method) {
     data = data || {};
@@ -77,7 +90,6 @@ Ember.PromisingAuth = Ember.Object.extend(Ember.Evented, {
 
   _success: function(response) {
     this.setProperties({
-      signedIn: true,
       authToken: response.auth_token,
       rememberToken: response.remember_token,
       userId: response.user_id
