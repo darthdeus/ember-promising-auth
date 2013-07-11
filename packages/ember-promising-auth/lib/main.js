@@ -76,16 +76,19 @@ Ember.PromisingAuth = Ember.Object.extend(Ember.Evented, {
     return !!this.get("userId");
   }.property("userId"),
 
-  ajax: function(url, data, method) {
+  ajax: function(url, data, method, settings) {
     data = data || {};
     data["auth_token"] = this.get("authToken");
+
 
     return Ember.$.ajax({
       url: url,
       type: method,
+      contentType: "application/json; charset=utf-8",
       dataType: "json",
       data: data
     });
+
   },
 
   _success: function(response) {
