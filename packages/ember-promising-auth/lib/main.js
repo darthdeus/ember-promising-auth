@@ -56,6 +56,7 @@ Ember.PromisingAuth = Ember.Object.extend(Ember.Evented, {
     response.then(function() {
       self.trigger("rememberSuccess");
     }, function() {
+      localStorage.removeItem(this.rememberTokenKey);
       self.trigger("rememberError");
     });
 
